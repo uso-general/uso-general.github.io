@@ -1,15 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Redireccionando...</title>
+    <title>Redirigiendo...</title>
     <script type="text/javascript">
         function redirect() {
-            window.location.href = 'ConexionMFA://auth';
+            // Obtener el código de autorización de la URL
+            var urlParams = new URLSearchParams(window.location.search);
+            var code = urlParams.get('code');
+
+            // Redirigir a una URL que tu aplicación pueda manejar
+            if (code) {
+                window.location.href = 'http://localhost:12345/?code=' + encodeURIComponent(code);
+            }
         }
         window.onload = redirect;
     </script>
 </head>
 <body>
-    <p>Redirigiendo a la aplicación...</p>
+    <p>Redirigiendo...</p>
 </body>
 </html>
