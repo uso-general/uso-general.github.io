@@ -9,10 +9,13 @@
             var code = urlParams.get('code');
             var accessToken = urlParams.get('access_token');
 
-            // Si tenemos un código de autorización, intercambiamos el código por un token
+            // Mostrar el código de autorización en la página para verificación
             if (code) {
+                document.getElementById('message').innerText = `Código de autorización recibido: ${code}`;
+
+                // Intercambiar el código por un token
                 try {
-                    let response = await fetch('https://login.microsoftonline.com/{793d3628-3a09-4a4c-aedd-ad6dd9a6adc6}/oauth2/v2.0/token', {
+                    let response = await fetch('https://login.microsoftonline.com/793d3628-3a09-4a4c-aedd-ad6dd9a6adc6/oauth2/v2.0/token', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
@@ -28,25 +31,25 @@
                     if (response.ok) {
                         let responseData = await response.json();
                         let token = responseData.access_token;
+                        // Mostrar el token en la página para verificación
+                        document.getElementById('message').innerText += `\nToken de acceso recibido: ${token}`;
                         // Redirigir a la aplicación local con el token
                         window.location.href = 'http://localhost:12345/?access_token=' + encodeURIComponent(token);
                     } else {
-                        console.error('Error al intercambiar el código por un token');
+                        document.getElementById('message').innerText += '\nError al intercambiar el código por un token';
                     }
                 } catch (error) {
-                    console.error('Error en la solicitud:', error);
+                    document.getElementById('message').innerText += `\nError en la solicitud: ${error}`;
                 }
-            }
-
-            // Si tenemos un token, redirigimos a la aplicación local
-            if (accessToken) {
-                window.location.href = 'http://localhost:12345/?access_token=' + encodeURIComponent(accessToken);
+            } else if (accessToken) {
+                // Mostrar el token directamente si está presente en la URL
+                document.getElementById('message').innerText = `Token de acceso recibido directamente: ${accessToken}`;
             }
         }
         window.onload = handleRedirect;
     </script>
 </head>
 <body>
-    <p>Redirigiendo...</p>
+    <p id="message">Procesando...</p>
 </body>
 </html>
