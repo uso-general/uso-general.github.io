@@ -4,7 +4,7 @@
     <title>Redirigiendo...</title>
     <script type="text/javascript">
         async function exchangeCodeForToken(code) {
-            const tokenUrl = 'https://login.microsoftonline.com/793d3628-3a09-4a4c-aedd-ad6dd9a6adc6/oauth2/v2.0/token'; // Cambia YOUR_TENANT_ID
+            const tokenUrl = 'https://login.microsoftonline.com/{793d3628-3a09-4a4c-aedd-ad6dd9a6adc6}/oauth2/v2.0/token'; // Cambia YOUR_TENANT_ID
             const params = new URLSearchParams();
             params.append('grant_type', 'authorization_code');
             params.append('client_id', '0dcfdbf3-5be3-49e2-b0c3-f235cc8de087'); // Cambia YOUR_CLIENT_ID
@@ -13,7 +13,7 @@
 
             try {
                 const response = await fetch(tokenUrl, {
-                    method: 'POST',
+                    method: POST,
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: params.toString()
                 });
