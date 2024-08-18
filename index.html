@@ -3,53 +3,46 @@
 <head>
     <title>Redirigiendo...</title>
     <script type="text/javascript">
-        async function exchangeCodeForToken(code) {
-            const tokenEndpoint = 'https://login.microsoftonline.com/793d3628-3a09-4a4c-aedd-ad6dd9a6adc6/oauth2/v2.0/token';
-            const clientId = '0dcfdbf3-5be3-49e2-b0c3-f235cc8de087';
-            const redirectUri = 'https://uso-general.github.io/uso-general.github.io'; // Asegúrate de que sea la misma URI de redireccionamiento
+        async function handleRedirect() {
+            // Obtener el código de autorización o el token de la URL
+            var urlParams = new URLSearchParams(window.location.search);
+            var code = urlParams.get('code');
+            var accessToken = urlParams.get('access_token');
 
-            const params = new URLSearchParams();
-            params.append('grant_type', 'authorization_code');
-            params.append('client_id', clientId);
-            params.append('code', code);
-            params.append('redirect_uri', redirectUri);
-
-            try {
-                const response = await fetch(tokenEndpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: params.toString()
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const accessToken = data.access_token;
-
-                    // Redirigir a la aplicación con el token
-                    window.location.href = 'http://localhost:12345/?access_token=' + encodeURIComponent(accessToken);
-                } else {
-                    console.error('Error al obtener el token: ', response.statusText);
-                    document.body.innerHTML = 'Error al obtener el token.';
-                }
-            } catch (error) {
-                console.error('Error en la solicitud de intercambio de código por token: ', error);
-                document.body.innerHTML = 'Error en la solicitud de intercambio de código por token.';
-            }
-        }
-
-        function handleRedirect() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-
+            // Si tenemos un código de autorización, intercambiamos el código por un token
             if (code) {
-                exchangeCodeForToken(code);
-            } else {
-                document.body.innerHTML = 'Código de autorización no encontrado.';
+                try {
+                    let response = await fetch('https://login.microsoftonline.com/{793d3628-3a09-4a4c-aedd-ad6dd9a6adc6}/oauth2/v2.0/token', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            grant_type: 'authorization_code',
+                            client_id: '0dcfdbf3-5be3-49e2-b0c3-f235cc8de087',
+                            code: code,
+                            redirect_uri: 'https://uso-general.github.io/uso-general.github.io'
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        let responseData = await response.json();
+                        let token = responseData.access_token;
+                        // Redirigir a la aplicación local con el token
+                        window.location.href = 'http://localhost:12345/?access_token=' + encodeURIComponent(token);
+                    } else {
+                        console.error('Error al intercambiar el código por un token');
+                    }
+                } catch (error) {
+                    console.error('Error en la solicitud:', error);
+                }
+            }
+
+            // Si tenemos un token, redirigimos a la aplicación local
+            if (accessToken) {
+                window.location.href = 'http://localhost:12345/?access_token=' + encodeURIComponent(accessToken);
             }
         }
-
         window.onload = handleRedirect;
     </script>
 </head>
