@@ -3,53 +3,48 @@
 <head>
     <title>Redirigiendo...</title>
     <script type="text/javascript">
-        async function handleRedirect() {
-            // Obtener el código de autorización o el token de la URL
-            var urlParams = new URLSearchParams(window.location.search);
-            var code = urlParams.get('code');
-            var accessToken = urlParams.get('access_token');
+        async function exchangeCodeForToken(code) {
+            const tokenUrl = 'https://login.microsoftonline.com/793d3628-3a09-4a4c-aedd-ad6dd9a6adc6/oauth2/v2.0/token'; // Cambia YOUR_TENANT_ID
+            const params = new URLSearchParams();
+            params.append('grant_type', 'authorization_code');
+            params.append('client_id', '0dcfdbf3-5be3-49e2-b0c3-f235cc8de087'); // Cambia YOUR_CLIENT_ID
+            params.append('code', code);
+            params.append('redirect_uri', 'https://uso-general.github.io/uso-general.github.io'); // Cambia la URL de redireccionamiento si es necesario
 
-            // Mostrar el código de autorización en la página para verificación
-            if (code) {
-                document.getElementById('message').innerText = `Código de autorización recibido: ${code}`;
+            try {
+                const response = await fetch(tokenUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
 
-                // Intercambiar el código por un token
-                try {
-                    let response = await fetch('https://login.microsoftonline.com/793d3628-3a09-4a4c-aedd-ad6dd9a6adc6/oauth2/v2.0/token', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: new URLSearchParams({
-                            grant_type: 'authorization_code',
-                            client_id: '0dcfdbf3-5be3-49e2-b0c3-f235cc8de087',
-                            code: code,
-                            redirect_uri: 'https://uso-general.github.io/uso-general.github.io'
-                        })
-                    });
-                    
-                    if (response.ok) {
-                        let responseData = await response.json();
-                        let token = responseData.access_token;
-                        // Mostrar el token en la página para verificación
-                        document.getElementById('message').innerText += `\nToken de acceso recibido: ${token}`;
-                        // Redirigir a la aplicación local con el token
-                        window.location.href = 'http://localhost:12345/?access_token=' + encodeURIComponent(token);
-                    } else {
-                        document.getElementById('message').innerText += '\nError al intercambiar el código por un token';
-                    }
-                } catch (error) {
-                    document.getElementById('message').innerText += `\nError en la solicitud: ${error}`;
+                if (response.ok) {
+                    const data = await response.json();
+                    const accessToken = data.access_token;
+                    // Redirigir a la aplicación de escritorio con el token
+                    window.location.href = 'http://localhost:12345/?access_token=' + encodeURIComponent(accessToken);
+                } else {
+                    throw new Error('Error al intercambiar el código por un token: ' + response.statusText);
                 }
-            } else if (accessToken) {
-                // Mostrar el token directamente si está presente en la URL
-                document.getElementById('message').innerText = `Token de acceso recibido directamente: ${accessToken}`;
+            } catch (error) {
+                console.error('Error:', error);
             }
         }
-        window.onload = handleRedirect;
+
+        function redirect() {
+            // Obtener el código de autorización de la URL
+            var urlParams = new URLSearchParams(window.location.search);
+            var code = urlParams.get('code');
+
+            // Intercambiar el código por un token
+            if (code) {
+                exchangeCodeForToken(code);
+            }
+        }
+        window.onload = redirect;
     </script>
 </head>
 <body>
-    <p id="message">Procesando...</p>
+    <p>Redirigiendo...</p>
 </body>
 </html>
