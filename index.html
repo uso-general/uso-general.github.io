@@ -1,50 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Redirigiendo...</title>
+    <meta charset="UTF-8">
+    <title>Token Exchange</title>
     <script type="text/javascript">
-        async function exchangeCodeForToken(code) {
-            const tokenUrl = 'https://login.microsoftonline.com/{793d3628-3a09-4a4c-aedd-ad6dd9a6adc6}/oauth2/v2.0/token'; // Cambia YOUR_TENANT_ID
-            const params = new URLSearchParams();
-            params.append('grant_type', 'authorization_code');
-            params.append('client_id', '0dcfdbf3-5be3-49e2-b0c3-f235cc8de087'); // Cambia YOUR_CLIENT_ID
-            params.append('code', code);
-            params.append('redirect_uri', 'https://uso-general.github.io/uso-general.github.io'); // Cambia la URL de redireccionamiento si es necesario
-
-            try {
-                const response = await fetch(tokenUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: params.toString()
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const accessToken = data.access_token;
-                    // Redirigir a la aplicación de escritorio con el token
-                    window.location.href = 'http://localhost:12345/?access_token=' + encodeURIComponent(accessToken);
-                } else {
-                    throw new Error('Error al intercambiar el código por un token: ' + response.statusText);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
         function redirect() {
-            // Obtener el código de autorización de la URL
             var urlParams = new URLSearchParams(window.location.search);
             var code = urlParams.get('code');
 
-            // Intercambiar el código por un token
             if (code) {
-                exchangeCodeForToken(code);
+                // Redirigir al servidor local con el código de autorización
+                window.location.href = 'http://localhost:5000/api/token?code=' + encodeURIComponent(code);
             }
         }
+
         window.onload = redirect;
     </script>
 </head>
 <body>
-    <p>Redirigiendo...</p>
+    <p>Procesando autenticación...</p>
 </body>
 </html>
