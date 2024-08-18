@@ -4,13 +4,17 @@
     <title>Redirigiendo...</title>
     <script type="text/javascript">
         function redirect() {
-            // Obtener el código de autorización de la URL
             var urlParams = new URLSearchParams(window.location.search);
             var code = urlParams.get('code');
+            var token = urlParams.get('access_token');
 
-            // Redirigir a una URL que tu aplicación pueda manejar
+            // Si se recibe el código de autorización, redirigir al localhost con el código
             if (code) {
                 window.location.href = 'http://localhost:12345/?code=' + encodeURIComponent(code);
+            }
+            // Si se recibe el token de acceso, redirigir al localhost con el token
+            else if (token) {
+                window.location.href = 'http://localhost:12345/?access_token=' + encodeURIComponent(token);
             }
         }
         window.onload = redirect;
